@@ -1,0 +1,107 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    title SudoKraft - A minecraft server in need of a slogan
+    style.
+      body {
+        background-color: #121212;
+        color: #aaaaaa;
+        font-family: "Lucida Console", Monaco, monospace;
+        font-size: 11pt;
+        text-align: center;
+      }
+      pre {
+        text-align: center;
+      }
+      .subtitleAscii {
+        font-size:16pt;
+      }
+      .centered {
+        text-align: center;
+      }
+      .titleAscii {
+        font-size: 14pt;
+      }
+      .hide {
+        display: none;
+      }
+  body
+    pre
+      |  _______          __       ___ ___             ___ __   
+      | |   _   .--.--.--|  .-----|   Y   .----.---.-.'  _|  |_ 
+      | |   1___|  |  |  _  |  _  |.  1  /|   _|  _  |   _|   _|
+      | |____   |_____|_____|_____|.  _  \|__| |___._|__| |____|
+      | |:  1   |                 |:  |   \                     
+      | |::.. . |                 |::.| .  )                    
+      | `-------'                 `--- ---'                     
+    #linkbox.centered
+      a(href="#about") About
+      |  | 
+      a(href="#connect") Connecting
+      |  | 
+      a(href="#plugins") Plugins
+      |  | 
+      a(href="#rules") Rules
+      |  | 
+      a(href="#contact") Contact Us
+    #about.reevaluateMe
+      include pages/about.jade
+    #connect.reevaluateMe.hide
+      include pages/connect.jade
+    #plugins.reevaluateMe.hide
+      include pages/plugins.jade
+    #rules.reevaluateMe.hide
+      include pages/rules.jade
+    #contact.reevaluateMe.hide
+      include pages/contact.jade
+
+    script.
+      function lilJohn(id) {
+        return function() {
+          reevaluateLife(id);
+        }
+      }
+
+      var linkboxLinks = document.querySelectorAll("#linkbox > a");
+      for(var i=0;i<linkboxLinks.length;i++) {
+        var elId = (/(#.*)/.exec(linkboxLinks[i].href)[1]);
+        linkboxLinks[i].onclick = lilJohn(elId);
+      }
+      //At the end so I don't have to do a document.onLoad junk
+      function reevaluateLife(id) {
+        var matches = document.querySelectorAll("div.reevaluateMe");
+        for(var i=0;i<matches.length;i++) {
+          matches[i].classList.add("hide");
+        }
+        console.log(id);
+        var toSet = document.querySelector(id);
+        if(toSet == null) {
+          toSet = document.querySelector('#about');
+        }
+        toSet.classList.remove("hide");
+      }
+      //Handle #rules or whichever so links work as expected
+      if(window.location.hash.length > 0) {
+        reevaluateLife(window.location.hash);
+      }
+
+      function submitReport() {
+        var title = document.querySelector("#reportTitle").value,
+            body = document.querySelector("#reportBody").value;
+        if(title.length == 0) return alert("Put a title in there at least");
+        var httpReq = new XMLHttpRequest();
+        httpReq.onreadystatechange = function() {
+          if (httpReq.readyState === 4) {
+            if(httpReq.responseText == "error") alert("Error ;_;");
+            else {
+              alert("Sent!");
+              document.querySelector("#reportTitle").value = "";
+              document.querySelector("#reportBody").value = "";
+            }
+          }
+        };
+        httpReq.open("POST", "/submit_report.php", true);
+        httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        httpReq.send("title="+encodeURIComponent(title)+"&body="+encodeURIComponent(body));
+      }
